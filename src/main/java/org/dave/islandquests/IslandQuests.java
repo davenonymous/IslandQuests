@@ -32,6 +32,9 @@ public class IslandQuests {
         IslandChunkRegistry.init();
         Dimensions.init();
         MinecraftForge.EVENT_BUS.register(PlayerEvents.class);
+
+        MinecraftForge.TERRAIN_GEN_BUS.register(VoidIslandsEvents.class);
+        MinecraftForge.ORE_GEN_BUS.register(VoidIslandsEvents.class);
         MinecraftForge.EVENT_BUS.register(VoidIslandsEvents.class);
     }
 }

@@ -6,12 +6,11 @@ import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.dave.islandquests.utility.Logz;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class IslandType {
     public String name;
@@ -27,6 +26,8 @@ public class IslandType {
     public IBlockState topBlock;
     public IBlockState fillerBlock;
     public IBlockState bedrockBlock;
+
+    public List<DecorateBiomeEvent.Decorate.EventType> blockedDecorationTypes = new ArrayList<>();
 
     public IslandType(String name) {
         this.name = name;
@@ -123,5 +124,12 @@ public class IslandType {
 
     public IBlockState getBedrockBlock() {
         return bedrockBlock != null ? bedrockBlock : null;
+    }
+
+    public void blockDecorationType(String decoration) {
+        DecorateBiomeEvent.Decorate.EventType type = DecorateBiomeEvent.Decorate.EventType.valueOf(decoration);
+        if(type != null) {
+            blockedDecorationTypes.add(type);
+        }
     }
 }
