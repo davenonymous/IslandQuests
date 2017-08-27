@@ -5,7 +5,6 @@ import com.google.common.collect.Table;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import org.dave.islandquests.world.VoidIslandsSavedData;
 
 public class IslandChunkRegistry {
     public static Table<Integer, Integer, IslandChunk> islandChunks;

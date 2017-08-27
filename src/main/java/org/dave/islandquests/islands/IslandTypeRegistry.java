@@ -29,6 +29,10 @@ public class IslandTypeRegistry {
         }
 
         for(File file : ConfigurationHandler.islandDir.listFiles()) {
+            if(!file.getName().endsWith(".js")) {
+                continue;
+            }
+
             Logz.info(" > Loading island types from file: '%s'", file.getName());
 
             ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
@@ -58,7 +62,12 @@ public class IslandTypeRegistry {
         if(islandTypes.containsKey(type.name)) {
             Logz.warn("Overwriting island type: %s (weight=%.1f, biome=%s)", type.name, type.weight, type.biome.getRegistryName());
         } else {
-            Logz.info("Registering island type: %s (weight=%.1f, biome=%s)", type.name, type.weight, type.biome.getRegistryName());
+            Logz.info("Registering island type: %s (weight=%.1f, biome=%s, top=%s, filler=%s, bedrock=%s)",
+                    type.name, type.weight, type.biome.getRegistryName(),
+                    type.getTopBlock().getBlock().getUnlocalizedName(),
+                    type.getFillerBlock().getBlock().getUnlocalizedName(),
+                    type.getBedrockBlock() != null ? type.getBedrockBlock().getBlock().getUnlocalizedName() : "-none-"
+            );
         }
 
         totalWeight += type.weight;

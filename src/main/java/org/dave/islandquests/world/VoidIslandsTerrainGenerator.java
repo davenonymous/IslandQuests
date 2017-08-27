@@ -1,6 +1,7 @@
 package org.dave.islandquests.world;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -107,8 +108,9 @@ public class VoidIslandsTerrainGenerator {
         }
 
 
-        IBlockState baseBlock = islandType.biome.topBlock;
-        IBlockState fillerBlock = islandType.biome.fillerBlock;
+        IBlockState topBlock = islandType.getTopBlock();
+        IBlockState fillerBlock = islandType.getFillerBlock();
+        IBlockState bedrockBlock = islandType.getBedrockBlock();
 
         for(int x = 0; x < 16; x++) {
             for(int z = 0; z < 16; z++) {
@@ -127,11 +129,15 @@ public class VoidIslandsTerrainGenerator {
                     int blockHillHeight = (int)Math.floor(WorldGenSettings.maxHillHeight * hillHeightRatio);
 
                     int heighestBlockY = islandType.minimumYLevel + islandChunk.getHeightOffset() + blockHillHeight;
-                    primer.setBlockState(x, heighestBlockY, z, baseBlock);
+                    primer.setBlockState(x, heighestBlockY, z, topBlock);
 
                     double blockFloorHeight = WorldGenSettings.maxFloorHeight * floorHeightRatio + blockHillHeight;
                     for(int y = 1; y < blockFloorHeight; y++) {
                         primer.setBlockState(x, heighestBlockY - y, z, fillerBlock);
+                    }
+
+                    if(bedrockBlock != null) {
+                        primer.setBlockState(x, heighestBlockY - (int) blockFloorHeight - 1, z, bedrockBlock);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package org.dave.islandquests;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -10,6 +11,7 @@ import org.dave.islandquests.locking.PlayerEvents;
 import org.dave.islandquests.configuration.ConfigurationHandler;
 import org.dave.islandquests.islands.IslandChunkRegistry;
 import org.dave.islandquests.islands.IslandTypeRegistry;
+import org.dave.islandquests.world.VoidIslandsEvents;
 import org.dave.islandquests.world.VoidIslandsSavedData;
 
 @Mod(modid = IslandQuests.MODID, version = IslandQuests.VERSION, name = "IslandType Quests", acceptedMinecraftVersions = "[1.12,1.13)")
@@ -31,5 +33,6 @@ public class IslandQuests {
         IslandChunkRegistry.init();
         Dimensions.init();
         MinecraftForge.EVENT_BUS.register(PlayerEvents.class);
+        MinecraftForge.EVENT_BUS.register(VoidIslandsEvents.class);
     }
 }
