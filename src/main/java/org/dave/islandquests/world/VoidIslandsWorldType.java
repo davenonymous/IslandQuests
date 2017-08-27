@@ -4,7 +4,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
+
 
 public class VoidIslandsWorldType extends WorldType {
     public VoidIslandsWorldType() {

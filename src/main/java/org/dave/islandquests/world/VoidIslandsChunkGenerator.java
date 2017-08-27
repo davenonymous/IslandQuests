@@ -8,10 +8,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 import org.dave.islandquests.islands.IslandChunkRegistry;
 import org.dave.islandquests.islands.IslandType;
-import org.dave.islandquests.utility.Logz;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -32,7 +31,7 @@ public class VoidIslandsChunkGenerator implements IChunkGenerator {
     }
 
     @Override
-    public Chunk provideChunk(int chunkX, int chunkZ) {
+    public Chunk generateChunk(int chunkX, int chunkZ) {
         ChunkPrimer cp = new ChunkPrimer();
 
         this.terrainGen.generate(chunkX, chunkZ, cp);
@@ -72,9 +71,15 @@ public class VoidIslandsChunkGenerator implements IChunkGenerator {
         return ImmutableList.of();
     }
 
+    @Override
+    public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
+        return false;
+    }
+
+    // XXX: Maybe use this to place Structures on islands?
     @Nullable
     @Override
-    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
+    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
         return null;
     }
 
