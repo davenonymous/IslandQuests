@@ -28,6 +28,7 @@ public class VoidIslandsChunkGenerator implements IChunkGenerator {
 
         this.world = world;
         this.terrainGen = new VoidIslandsTerrainGenerator(world, this);
+        VoidIslandsDimensionRegistry.instance.registerTerrainGen(world, this.terrainGen);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class VoidIslandsChunkGenerator implements IChunkGenerator {
         Chunk chunk = new Chunk(this.world, cp, chunkX, chunkZ);
 
         final byte[] biomeArray = new byte[256];
-        IslandType island = IslandChunkRegistry.getIslandType(chunkX, chunkZ);
+        IslandType island = IslandChunkRegistry.instance.getIslandType(chunkX, chunkZ);
         if(island != null) {
             Arrays.fill(biomeArray, (byte) Biome.getIdForBiome(island.biome));
         } else {
@@ -53,7 +54,7 @@ public class VoidIslandsChunkGenerator implements IChunkGenerator {
 
     @Override
     public void populate(int chunkX, int chunkZ) {
-        IslandType island = IslandChunkRegistry.getIslandType(chunkX, chunkZ);
+        IslandType island = IslandChunkRegistry.instance.getIslandType(chunkX, chunkZ);
         if(island == null) {
             return;
         }

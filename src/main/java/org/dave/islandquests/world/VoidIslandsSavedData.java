@@ -22,7 +22,7 @@ public class VoidIslandsSavedData extends WorldSavedData {
         }
 
         Logz.info("Clearing island chunk registry for next world");
-        IslandChunkRegistry.init();
+        IslandChunkRegistry.instance.init();
     }
 
     @SubscribeEvent
@@ -46,13 +46,13 @@ public class VoidIslandsSavedData extends WorldSavedData {
         NBTTagList list = nbt.getTagList("islandchunks", 10);
 
         if(list != null) {
-            IslandChunkRegistry.loadFromTagList(list);
+            IslandChunkRegistry.instance.loadFromTagList(list);
         }
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound.setTag("islandchunks", IslandChunkRegistry.createTagList());
+        compound.setTag("islandchunks", IslandChunkRegistry.instance.createTagList());
 
         return compound;
     }

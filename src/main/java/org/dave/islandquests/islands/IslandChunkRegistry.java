@@ -6,25 +6,41 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
+import org.dave.islandquests.api.IIslandChunkRegistry;
 
-public class IslandChunkRegistry {
-    public static Table<Integer, Integer, IslandChunk> islandChunks;
+import java.util.Optional;
 
-    public static void init() {
+public class IslandChunkRegistry implements IIslandChunkRegistry {
+    public static IslandChunkRegistry instance = new IslandChunkRegistry();
+
+    public Table<Integer, Integer, IslandChunk> islandChunks;
+
+    public void init() {
         islandChunks = HashBasedTable.create();
     }
 
-    public static boolean isKnownChunk(int chunkX, int chunkZ) {
+    public IslandChunk getRandomIslandChunk() {
+        Optional<IslandChunk> optChunk = islandChunks.values().stream().findAny();
+        if(optChunk.isPresent()) {
+            return optChunk.get();
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean isKnownChunk(int chunkX, int chunkZ) {
         return islandChunks.contains(chunkX, chunkZ);
     }
 
-    public static boolean isKnownChunk(BlockPos pos) {
+    @Override
+    public boolean isKnownChunk(BlockPos pos) {
         int chunkX = pos.getX() >> 4;
         int chunkZ = pos.getZ() >> 4;
         return isKnownChunk(chunkX, chunkZ);
     }
 
-    public static IslandChunk getIslandChunk(int chunkX, int chunkZ) {
+    public IslandChunk getIslandChunk(int chunkX, int chunkZ) {
         IslandChunk chunk = islandChunks.get(chunkX, chunkZ);
         if(chunk == null) {
             chunk = new IslandChunk(chunkX, chunkZ);
@@ -34,13 +50,15 @@ public class IslandChunkRegistry {
         return chunk;
     }
 
-    public static IslandChunk getIslandChunk(BlockPos pos) {
+    @Override
+    public IslandChunk getIslandChunk(BlockPos pos) {
         int chunkX = pos.getX() >> 4;
         int chunkZ = pos.getZ() >> 4;
         return getIslandChunk(chunkX, chunkZ);
     }
 
-    public static IslandType getIslandType(int chunkX, int chunkZ) {
+    @Override
+    public IslandType getIslandType(int chunkX, int chunkZ) {
         IslandChunk chunk = islandChunks.get(chunkX, chunkZ);
         if(chunk == null) {
             return null;
@@ -49,13 +67,14 @@ public class IslandChunkRegistry {
         return chunk.getIslandType();
     }
 
-    public static IslandType getIslandType(BlockPos pos) {
+    @Override
+    public IslandType getIslandType(BlockPos pos) {
         int chunkX = pos.getX() >> 4;
         int chunkZ = pos.getZ() >> 4;
         return getIslandType(chunkX, chunkZ);
     }
 
-    public static NBTTagList createTagList() {
+    public NBTTagList createTagList() {
         NBTTagList list = new NBTTagList();
         for(IslandChunk chunk : islandChunks.values()) {
             list.appendTag(chunk.createTagCompound());
@@ -64,10 +83,10 @@ public class IslandChunkRegistry {
         return list;
     }
 
-    public static void loadFromTagList(NBTTagList list) {
+    public void loadFromTagList(NBTTagList list) {
         for(NBTBase entry : list) {
             IslandChunk chunk = IslandChunk.newFromTagCompound((NBTTagCompound) entry);
-            islandChunks.put(chunk.getX(), chunk.getZ(), chunk);
+            islandChunks.put(chunk.getChunkX(), chunk.getChunkZ(), chunk);
         }
     }
 }

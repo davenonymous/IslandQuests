@@ -4,12 +4,16 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.dave.islandquests.api.IIslandQuestsPlugin;
 import org.dave.islandquests.configuration.ConfigurationHandler;
 import org.dave.islandquests.init.Dimensions;
 import org.dave.islandquests.islands.IslandChunkRegistry;
 import org.dave.islandquests.islands.IslandTypeRegistry;
 import org.dave.islandquests.locking.PlayerEvents;
+import org.dave.islandquests.utility.AnnotatedInstanceUtil;
+import org.dave.islandquests.utility.Logz;
 import org.dave.islandquests.world.VoidIslandsEvents;
 import org.dave.islandquests.world.VoidIslandsSavedData;
 
@@ -20,6 +24,9 @@ public class IslandQuests {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        Logz.logger = event.getModLog();
+        AnnotatedInstanceUtil.setAsmData(event.getAsmData());
+
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
 
         MinecraftForge.EVENT_BUS.register(ConfigurationHandler.class);
@@ -28,13 +35,19 @@ public class IslandQuests {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        IslandTypeRegistry.init();
-        IslandChunkRegistry.init();
+        IslandTypeRegistry.instance.init();
+        IslandChunkRegistry.instance.init();
         Dimensions.init();
         MinecraftForge.EVENT_BUS.register(PlayerEvents.class);
 
         MinecraftForge.TERRAIN_GEN_BUS.register(VoidIslandsEvents.class);
         MinecraftForge.ORE_GEN_BUS.register(VoidIslandsEvents.class);
         MinecraftForge.EVENT_BUS.register(VoidIslandsEvents.class);
+    }
+
+    public void postInit(FMLPostInitializationEvent event) {
+        for(IIslandQuestsPlugin plugin : AnnotatedInstanceUtil.getIQPlugins()) {
+            plugin.onChunkRegistryAvailable(IslandChunkRegistry.instance);
+        }
     }
 }

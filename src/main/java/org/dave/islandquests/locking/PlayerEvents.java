@@ -7,6 +7,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.dave.islandquests.islands.IslandChunk;
 import org.dave.islandquests.islands.IslandType;
 import org.dave.islandquests.islands.IslandChunkRegistry;
 import org.dave.islandquests.utility.Logz;
@@ -30,10 +31,12 @@ public class PlayerEvents {
             int chunkX = (int)Minecraft.getMinecraft().player.posX >> 4;
             int chunkZ = (int)Minecraft.getMinecraft().player.posZ >> 4;
 
-            IslandType island = IslandChunkRegistry.getIslandType(chunkX, chunkZ);
+            IslandType island = IslandChunkRegistry.instance.getIslandType(chunkX, chunkZ);
+            IslandChunk chunk = IslandChunkRegistry.instance.getIslandChunk(chunkX, chunkZ);
             if(island != null) {
                 //Logz.info("IslandHash: " + island.hashCode());
-                event.getLeft().add("IslandType Biome: " + island.biome.getRegistryName());
+                String iqDebugText = String.format("island=%s, biome=%s, height=%d", island.name, island.biome.getRegistryName(), island.minimumYLevel + chunk.getHeightOffset());
+                event.getLeft().add(iqDebugText);
             }
         }
     }

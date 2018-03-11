@@ -3,16 +3,16 @@ package org.dave.islandquests.islands;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import org.dave.islandquests.api.IIslandType;
 import org.dave.islandquests.utility.Logz;
 
 import java.util.*;
 
-public class IslandType {
+public class IslandType implements IIslandType {
     public String name;
 
     public Biome biome;
@@ -70,6 +70,7 @@ public class IslandType {
         this.weight = weight;
     }
 
+    @SuppressWarnings("deprecation")
     public void addOreSpawn(String blockName, int meta, float weight) {
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
         if(ore == null) {
@@ -81,6 +82,7 @@ public class IslandType {
         oreWeights.put(state, weight);
     }
 
+    @SuppressWarnings("deprecation")
     public void setTopBlock(String blockName, int meta) {
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
         if(block == null) {
@@ -92,6 +94,7 @@ public class IslandType {
         this.topBlock = state;
     }
 
+    @SuppressWarnings("deprecation")
     public void setFillerBlock(String blockName, int meta) {
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
         if(block == null) {
@@ -103,6 +106,7 @@ public class IslandType {
         this.fillerBlock = state;
     }
 
+    @SuppressWarnings("deprecation")
     public void setBedrockBlock(String blockName, int meta) {
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
         if(block == null) {
@@ -114,16 +118,34 @@ public class IslandType {
         this.bedrockBlock = state;
     }
 
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public Biome getBiome() {
+        return biome;
+    }
+
+    @Override
     public IBlockState getTopBlock() {
         return topBlock != null ? topBlock : biome.topBlock;
     }
 
+    @Override
     public IBlockState getFillerBlock() {
         return fillerBlock != null ? fillerBlock : biome.fillerBlock;
     }
 
+    @Override
     public IBlockState getBedrockBlock() {
         return bedrockBlock != null ? bedrockBlock : null;
+    }
+
+    @Override
+    public Map<IBlockState, Float> getOreWeights() {
+        return this.oreWeights;
     }
 
     public void blockDecorationType(String decoration) {

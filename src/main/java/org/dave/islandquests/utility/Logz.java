@@ -1,12 +1,13 @@
 package org.dave.islandquests.utility;
 
-import net.minecraftforge.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
-import org.dave.islandquests.IslandQuests;
+import org.apache.logging.log4j.Logger;
 
 public class Logz {
+    public static Logger logger;
+
     public static void log(Level logLevel, String fmt, Object... data) {
-        FMLLog.log(IslandQuests.MODID, logLevel, fmt, data);
+        logger.log(logLevel, String.format(fmt, data));
     }
 
     public static void all(String fmt, Object... data) {

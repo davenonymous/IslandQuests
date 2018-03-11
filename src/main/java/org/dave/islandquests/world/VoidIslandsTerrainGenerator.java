@@ -1,15 +1,14 @@
 package org.dave.islandquests.world;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import org.dave.islandquests.configuration.WorldGenSettings;
-import org.dave.islandquests.islands.IslandType;
 import org.dave.islandquests.islands.IslandChunk;
 import org.dave.islandquests.islands.IslandChunkRegistry;
+import org.dave.islandquests.islands.IslandType;
 import org.dave.islandquests.islands.IslandTypeRegistry;
 import org.dave.islandquests.utility.Logz;
 import org.dave.islandquests.utility.OpenSimplexNoise;
@@ -23,14 +22,13 @@ public class VoidIslandsTerrainGenerator {
     private final OpenSimplexNoise noise;
     private final OpenSimplexNoise noiseHeight;
 
-    private final int islandY = 60;
-
     private final Random rand;
 
     public VoidIslandsTerrainGenerator(World world, VoidIslandsChunkGenerator provider) {
         this.world = world;
         this.provider = provider;
 
+        // TODO: We should be able to reuse the worlds rand
         this.rand = new Random(this.world.getSeed());
         this.noise = new OpenSimplexNoise(rand.nextLong());
         this.noiseHeight = new OpenSimplexNoise(rand.nextLong());
@@ -58,7 +56,7 @@ public class VoidIslandsTerrainGenerator {
                 if (z == 0 && x == 0) continue;
                 if (isVoid(chunkX + x, chunkZ + z)) continue;
 
-                IslandChunk chunk = IslandChunkRegistry.getIslandChunk(chunkX + x, chunkZ + z);
+                IslandChunk chunk = IslandChunkRegistry.instance.getIslandChunk(chunkX + x, chunkZ + z);
                 if (chunk.isProcessed()) continue;
 
                 chunk.setIslandType(islandType);
@@ -85,12 +83,12 @@ public class VoidIslandsTerrainGenerator {
 
         IslandChunk islandChunk;
         IslandType islandType;
-        if(!IslandChunkRegistry.isKnownChunk(chunkX, chunkZ)) {
+        if(!IslandChunkRegistry.instance.isKnownChunk(chunkX, chunkZ)) {
             // First we need to *virtually* find all chunks that belong to the same island
             // and mark them all with the values needed for this island
 
-            islandType = IslandTypeRegistry.getRandomIslandType();
-            islandChunk = IslandChunkRegistry.getIslandChunk(chunkX, chunkZ);
+            islandType = IslandTypeRegistry.instance.getRandomIslandType();
+            islandChunk = IslandChunkRegistry.instance.getIslandChunk(chunkX, chunkZ);
 
             int heightOffset = islandType.getRandomYOffset(this.rand);
             islandChunk.setHeightOffset(heightOffset);
@@ -103,7 +101,7 @@ public class VoidIslandsTerrainGenerator {
                 VoidIslandsSavedData.INSTANCE.markDirty();
             }
         } else {
-            islandChunk = IslandChunkRegistry.getIslandChunk(chunkX, chunkZ);
+            islandChunk = IslandChunkRegistry.instance.getIslandChunk(chunkX, chunkZ);
             islandType = islandChunk.getIslandType();
         }
 
@@ -138,6 +136,12 @@ public class VoidIslandsTerrainGenerator {
 
                     if(bedrockBlock != null) {
                         primer.setBlockState(x, heighestBlockY - (int) blockFloorHeight - 1, z, bedrockBlock);
+                    }
+
+                    if(VoidIslandsEvents.isFirstSpawnPointCreation && chance > WorldGenSettings.minimum + 0.15f) {
+                        VoidIslandsEvents.isFirstSpawnPointCreation = false;
+                        Logz.info("Setting spawnpoint to: %s", new BlockPos(actualX, heighestBlockY+1, actualZ));
+                        world.setSpawnPoint(new BlockPos(actualX, heighestBlockY+1, actualZ));
                     }
                 }
             }

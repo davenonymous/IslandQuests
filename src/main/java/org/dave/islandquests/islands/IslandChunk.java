@@ -1,8 +1,9 @@
 package org.dave.islandquests.islands;
 
 import net.minecraft.nbt.NBTTagCompound;
+import org.dave.islandquests.api.IIslandChunk;
 
-public class IslandChunk {
+public class IslandChunk implements IIslandChunk {
     private int chunkX;
     private int chunkZ;
     private boolean processed;
@@ -15,6 +16,7 @@ public class IslandChunk {
         this.processed = false;
     }
 
+    @Override
     public boolean isProcessed() {
         return processed;
     }
@@ -23,6 +25,7 @@ public class IslandChunk {
         this.processed = processed;
     }
 
+    @Override
     public IslandType getIslandType() {
         return islandType;
     }
@@ -35,15 +38,18 @@ public class IslandChunk {
         this.heightOffset = heightOffset;
     }
 
+    @Override
     public int getHeightOffset() {
         return heightOffset;
     }
 
-    public int getX() {
+    @Override
+    public int getChunkX() {
         return chunkX;
     }
 
-    public int getZ() {
+    @Override
+    public int getChunkZ() {
         return chunkZ;
     }
 
@@ -60,7 +66,7 @@ public class IslandChunk {
     public static IslandChunk newFromTagCompound(NBTTagCompound tag) {
         IslandChunk result = new IslandChunk(tag.getInteger("x"), tag.getInteger("z"));
         result.setProcessed(true);
-        result.setIslandType(IslandTypeRegistry.getIslandType(tag.getString("type")));
+        result.setIslandType(IslandTypeRegistry.instance.getIslandType(tag.getString("type")));
         result.setHeightOffset(tag.getInteger("y"));
 
         return result;

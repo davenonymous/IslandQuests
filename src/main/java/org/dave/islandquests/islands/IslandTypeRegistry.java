@@ -14,14 +14,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IslandTypeRegistry {
-    public static Map<String, IslandType> islandTypes;
-    private static double totalWeight = 0.0;
+    public static IslandTypeRegistry instance = new IslandTypeRegistry();
 
-    public static void init() {
+    public Map<String, IslandType> islandTypes;
+    private double totalWeight = 0.0;
+
+    public void init() {
         reload();
     }
 
-    public static void reload() {
+    public void reload() {
         islandTypes = new HashMap<>();
 
         if(!ConfigurationHandler.islandDir.exists()) {
@@ -58,7 +60,7 @@ public class IslandTypeRegistry {
         }
     }
 
-    public static void registerIslandType(IslandType type) {
+    public void registerIslandType(IslandType type) {
         if(islandTypes.containsKey(type.name)) {
             Logz.warn("Overwriting island type: %s (weight=%.1f, biome=%s)", type.name, type.weight, type.biome.getRegistryName());
         } else {
@@ -74,7 +76,7 @@ public class IslandTypeRegistry {
         islandTypes.put(type.name, type);
     }
 
-    public static IslandType getRandomIslandType() {
+    public IslandType getRandomIslandType() {
         double treshold = Math.random() * totalWeight;
         double position = 0.0;
         for(IslandType type : islandTypes.values()) {
@@ -87,7 +89,7 @@ public class IslandTypeRegistry {
         return null;
     }
 
-    public static IslandType getIslandType(String name) {
+    public IslandType getIslandType(String name) {
         return islandTypes.get(name);
     }
 }
