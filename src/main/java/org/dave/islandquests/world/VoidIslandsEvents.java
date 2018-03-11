@@ -12,9 +12,9 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.dave.islandquests.islands.IslandChunkRegistry;
+import org.dave.islandquests.islands.Island;
+import org.dave.islandquests.islands.IslandRegistry;
 import org.dave.islandquests.islands.IslandType;
-import org.dave.islandquests.utility.Logz;
 
 public class VoidIslandsEvents {
     public static boolean isFirstSpawnPointCreation = false;
@@ -78,7 +78,6 @@ public class VoidIslandsEvents {
 
         while(tryNum < maxTries) {
             Tuple<Integer, Integer> pos = getSpiralPosition(tryNum);
-            Logz.info("%d: Checking chunk in spiral: %d, %d", tryNum, pos.getFirst(), pos.getSecond());
             if(!terrainGenerator.isVoid(pos.getFirst(), pos.getSecond())) {
                 world.setSpawnPoint(new BlockPos(pos.getFirst() << 4, 100, pos.getSecond() << 4));
                 event.setCanceled(true);
@@ -120,18 +119,14 @@ public class VoidIslandsEvents {
             return;
         }
 
-        if(!IslandChunkRegistry.instance.isKnownChunk(event.getPos())) {
-            Logz.info("Decorating biome of unknown island chunk");
+        if(!IslandRegistry.instance.hasIsland(event.getPos())) {
             return;
         }
 
-        IslandType type = IslandChunkRegistry.instance.getIslandType(event.getPos());
-        if(type == null) {
-            Logz.info("No island type for biome decoration");
-            return;
-        }
+        Island island = IslandRegistry.instance.getIsland(event.getPos());
+        IslandType islandType = island.getIslandType();
 
-        if(type.blockedDecorationTypes.contains(event.getType())) {
+        if(islandType.blockedDecorationTypes.contains(event.getType())) {
             event.setResult(Event.Result.DENY);
         }
     }

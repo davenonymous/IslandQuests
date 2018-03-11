@@ -1,6 +1,6 @@
 package org.dave.islandquests.api;
 
 public interface IIslandQuestsPlugin {
-    default void onChunkRegistryAvailable(IIslandChunkRegistry islandChunkRegistry) {
+    default void onChunkRegistryAvailable(IIslandRegistry islandRegistry) {
     }
 }

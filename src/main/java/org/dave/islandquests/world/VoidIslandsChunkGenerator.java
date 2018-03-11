@@ -9,7 +9,8 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
-import org.dave.islandquests.islands.IslandChunkRegistry;
+import org.dave.islandquests.islands.Island;
+import org.dave.islandquests.islands.IslandRegistry;
 import org.dave.islandquests.islands.IslandType;
 
 import javax.annotation.Nullable;
@@ -40,9 +41,10 @@ public class VoidIslandsChunkGenerator implements IChunkGenerator {
         Chunk chunk = new Chunk(this.world, cp, chunkX, chunkZ);
 
         final byte[] biomeArray = new byte[256];
-        IslandType island = IslandChunkRegistry.instance.getIslandType(chunkX, chunkZ);
-        if(island != null) {
-            Arrays.fill(biomeArray, (byte) Biome.getIdForBiome(island.biome));
+        if(IslandRegistry.instance.hasIsland(chunkX, chunkZ)) {
+            Island island = IslandRegistry.instance.getIsland(chunkX, chunkZ);
+            IslandType islandType = island.getIslandType();
+            Arrays.fill(biomeArray, (byte) Biome.getIdForBiome(islandType.biome));
         } else {
             Arrays.fill(biomeArray, (byte) Biome.getIdForBiome(Biomes.VOID));
         }
@@ -54,12 +56,13 @@ public class VoidIslandsChunkGenerator implements IChunkGenerator {
 
     @Override
     public void populate(int chunkX, int chunkZ) {
-        IslandType island = IslandChunkRegistry.instance.getIslandType(chunkX, chunkZ);
-        if(island == null) {
+        if(!IslandRegistry.instance.hasIsland(chunkX, chunkZ)) {
             return;
         }
+        Island island = IslandRegistry.instance.getIsland(chunkX, chunkZ);
+        IslandType islandType = island.getIslandType();
 
-        island.biome.decorate(this.world, this.rand, new BlockPos(chunkX * 16, 41, chunkZ * 16));
+        islandType.biome.decorate(this.world, this.rand, new BlockPos(chunkX * 16, 41, chunkZ * 16));
     }
 
     @Override

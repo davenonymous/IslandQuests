@@ -2,17 +2,17 @@ package org.dave.islandquests.world;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import org.dave.islandquests.configuration.WorldGenSettings;
-import org.dave.islandquests.islands.IslandChunk;
-import org.dave.islandquests.islands.IslandChunkRegistry;
-import org.dave.islandquests.islands.IslandType;
-import org.dave.islandquests.islands.IslandTypeRegistry;
+import org.dave.islandquests.islands.*;
 import org.dave.islandquests.utility.Logz;
 import org.dave.islandquests.utility.OpenSimplexNoise;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class VoidIslandsTerrainGenerator {
@@ -50,22 +50,33 @@ public class VoidIslandsTerrainGenerator {
         return true;
     }
 
-    private void processNeighborChunks(int chunkX, int chunkZ, IslandType islandType, int heightOffset) {
+    private List<ChunkPos> addConnectedChunksToList(List<ChunkPos> result, int chunkX, int chunkZ) {
         for(int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
+                // Don't check the block we are currently looking at, check the neighbors only
                 if (z == 0 && x == 0) continue;
+
+                // Void chunks are island borders, skip
                 if (isVoid(chunkX + x, chunkZ + z)) continue;
 
-                IslandChunk chunk = IslandChunkRegistry.instance.getIslandChunk(chunkX + x, chunkZ + z);
-                if (chunk.isProcessed()) continue;
+                // There already is a known island on that chunk, skip
+                if(IslandRegistry.instance.hasIsland(chunkX, chunkZ)) {
+                    continue;
+                }
 
-                chunk.setIslandType(islandType);
-                chunk.setProcessed(true);
-                chunk.setHeightOffset(heightOffset);
+                ChunkPos chunkPos = new ChunkPos(chunkX + x, chunkZ + z);
 
-                processNeighborChunks(chunkX + x, chunkZ + z, islandType, heightOffset);
+                // Do not process the same chunk twice
+                if(result.contains(chunkPos)) {
+                    continue;
+                }
+
+                result.add(chunkPos);
+                addConnectedChunksToList(result, chunkPos.x, chunkPos.z);
             }
         }
+
+        return result;
     }
 
     /**
@@ -81,30 +92,25 @@ public class VoidIslandsTerrainGenerator {
             return false;
         }
 
-        IslandChunk islandChunk;
+        Island island;
         IslandType islandType;
-        if(!IslandChunkRegistry.instance.isKnownChunk(chunkX, chunkZ)) {
-            // First we need to *virtually* find all chunks that belong to the same island
-            // and mark them all with the values needed for this island
-
+        if(!IslandRegistry.instance.hasIsland(chunkX, chunkZ)) {
             islandType = IslandTypeRegistry.instance.getRandomIslandType();
-            islandChunk = IslandChunkRegistry.instance.getIslandChunk(chunkX, chunkZ);
-
             int heightOffset = islandType.getRandomYOffset(this.rand);
-            islandChunk.setHeightOffset(heightOffset);
-            islandChunk.setIslandType(islandType);
-            islandChunk.setProcessed(true);
 
-            processNeighborChunks(chunkX, chunkZ, islandType, heightOffset);
+            island = new Island(islandType, heightOffset);
+
+            island.setChunks(addConnectedChunksToList(new ArrayList<>(), chunkX, chunkZ));
+
+            IslandRegistry.instance.registerNewIsland(island);
 
             if(VoidIslandsSavedData.INSTANCE != null) {
                 VoidIslandsSavedData.INSTANCE.markDirty();
             }
         } else {
-            islandChunk = IslandChunkRegistry.instance.getIslandChunk(chunkX, chunkZ);
-            islandType = islandChunk.getIslandType();
+            island = IslandRegistry.instance.getIsland(chunkX, chunkZ);
+            islandType = island.getIslandType();
         }
-
 
         IBlockState topBlock = islandType.getTopBlock();
         IBlockState fillerBlock = islandType.getFillerBlock();
@@ -126,7 +132,7 @@ public class VoidIslandsTerrainGenerator {
                     double hillHeightRatio = hillHeight * floorHeightRatio;
                     int blockHillHeight = (int)Math.floor(WorldGenSettings.maxHillHeight * hillHeightRatio);
 
-                    int heighestBlockY = islandType.minimumYLevel + islandChunk.getHeightOffset() + blockHillHeight;
+                    int heighestBlockY = islandType.minimumYLevel + island.getHeightOffset() + blockHillHeight;
                     primer.setBlockState(x, heighestBlockY, z, topBlock);
 
                     double blockFloorHeight = WorldGenSettings.maxFloorHeight * floorHeightRatio + blockHillHeight;

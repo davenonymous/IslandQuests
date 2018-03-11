@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.dave.islandquests.api.IIslandQuestsPlugin;
 import org.dave.islandquests.configuration.ConfigurationHandler;
 import org.dave.islandquests.init.Dimensions;
-import org.dave.islandquests.islands.IslandChunkRegistry;
+import org.dave.islandquests.islands.IslandRegistry;
 import org.dave.islandquests.islands.IslandTypeRegistry;
 import org.dave.islandquests.locking.PlayerEvents;
 import org.dave.islandquests.utility.AnnotatedInstanceUtil;
@@ -36,7 +36,8 @@ public class IslandQuests {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         IslandTypeRegistry.instance.init();
-        IslandChunkRegistry.instance.init();
+        IslandRegistry.instance.init();
+
         Dimensions.init();
         MinecraftForge.EVENT_BUS.register(PlayerEvents.class);
 
@@ -47,7 +48,7 @@ public class IslandQuests {
 
     public void postInit(FMLPostInitializationEvent event) {
         for(IIslandQuestsPlugin plugin : AnnotatedInstanceUtil.getIQPlugins()) {
-            plugin.onChunkRegistryAvailable(IslandChunkRegistry.instance);
+            plugin.onChunkRegistryAvailable(IslandRegistry.instance);
         }
     }
 }

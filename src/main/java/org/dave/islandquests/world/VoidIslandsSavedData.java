@@ -3,9 +3,10 @@ package org.dave.islandquests.world;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.dave.islandquests.islands.IslandChunkRegistry;
+import org.dave.islandquests.islands.IslandRegistry;
 import org.dave.islandquests.utility.Logz;
 
 public class VoidIslandsSavedData extends WorldSavedData {
@@ -21,8 +22,8 @@ public class VoidIslandsSavedData extends WorldSavedData {
             return;
         }
 
-        Logz.info("Clearing island chunk registry for next world");
-        IslandChunkRegistry.instance.init();
+        Logz.info("Clearing island registry for next world");
+        IslandRegistry.instance.init();
     }
 
     @SubscribeEvent
@@ -43,17 +44,16 @@ public class VoidIslandsSavedData extends WorldSavedData {
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
-        NBTTagList list = nbt.getTagList("islandchunks", 10);
+        NBTTagList list = nbt.getTagList("islands", Constants.NBT.TAG_COMPOUND);
 
         if(list != null) {
-            IslandChunkRegistry.instance.loadFromTagList(list);
+            IslandRegistry.instance.loadFromTagList(list);
         }
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound.setTag("islandchunks", IslandChunkRegistry.instance.createTagList());
-
+        compound.setTag("islands", IslandRegistry.instance.createTagList());
         return compound;
     }
 }
