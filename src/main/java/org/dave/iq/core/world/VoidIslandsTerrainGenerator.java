@@ -98,7 +98,7 @@ public class VoidIslandsTerrainGenerator {
         Island island;
         IIslandType islandType;
         if(!IslandRegistry.instance.hasIsland(chunkX, chunkZ)) {
-            islandType = IslandTypeRegistry.instance.getRandomIslandType();
+            islandType = IslandTypeRegistry.instance.getRandomIslandType(rand);
             int heightOffset = world.rand.nextInt(islandType.getIslandHeightOffsetRange());
 
             island = new Island(islandType, heightOffset);

@@ -6,15 +6,12 @@ import org.dave.iq.api.IIslandTypeRegistry;
 import org.dave.iq.core.configuration.ConfigurationHandler;
 import org.dave.iq.core.utility.Logz;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class IslandTypeRegistry implements IIslandTypeRegistry {
     public static IslandTypeRegistry instance = new IslandTypeRegistry();
@@ -36,25 +33,6 @@ public class IslandTypeRegistry implements IIslandTypeRegistry {
         }
 
         for(File file : ConfigurationHandler.islandDir.listFiles()) {
-            if(file.getName().endsWith(".js")) {
-                Logz.info(" > Loading island types from file: '%s'", file.getName());
-
-                ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-                try {
-                    engine.eval(new FileReader(file));
-                    Invocable invocable = (Invocable) engine;
-
-                    invocable.invokeFunction("main");
-                } catch (ScriptException e) {
-                    Logz.warn("Could not compile+eval script=%s: %s", file.getName(), e);
-                    continue;
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    Logz.warn("Script %s is missing a method: %s", file.getName(), e);
-                }
-            }
-
             if(file.getName().endsWith(".json")) {
                 Logz.info(" > Loading island type from file: '%s'", file.getName());
                 try {
@@ -64,7 +42,6 @@ public class IslandTypeRegistry implements IIslandTypeRegistry {
                     e.printStackTrace();
                 }
             }
-
         }
 
         if(islandTypes.size() == 0) {
@@ -91,8 +68,8 @@ public class IslandTypeRegistry implements IIslandTypeRegistry {
         islandTypes.put(type.getName(), type);
     }
 
-    public IIslandType getRandomIslandType() {
-        double treshold = Math.random() * totalWeight;
+    public IIslandType getRandomIslandType(Random rand) {
+        double treshold = rand.nextDouble() * totalWeight;
         double position = 0.0;
         for(IIslandType type : islandTypes.values()) {
             position += type.getWeight();
