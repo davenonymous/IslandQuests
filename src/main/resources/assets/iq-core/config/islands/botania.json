@@ -33,7 +33,7 @@
       "data": {
         "rules": [
           {
-            "chance": 0.1,
+            "chance": 0.2,
             "original": {
               "name": "minecraft:tallgrass",
               "meta": "*"
@@ -44,7 +44,7 @@
             }
           },
           {
-            "chance": 0.1,
+            "chance": 0.2,
             "original": {
               "name": "minecraft:double_plant",
               "meta": "*"

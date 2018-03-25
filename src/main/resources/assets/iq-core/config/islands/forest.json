@@ -1,0 +1,21 @@
+{
+  "name": "Forest",
+
+  "weight": 100,
+  "biome": "minecraft:forest",
+  "y-level": 30,
+  "y-range": 100,
+
+  "bedrock-edge": false,
+
+  "blocks": {
+    "filler": {
+      "name": "minecraft:stone",
+      "meta": 0
+    },
+    "bedrock": {
+      "name": "minecraft:stone",
+      "meta": 0
+    }
+  }
+}

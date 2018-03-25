@@ -1,0 +1,26 @@
+{
+  "name": "Desert",
+
+  "weight": 100,
+  "biome": "minecraft:desert",
+  "y-level": 30,
+  "y-range": 100,
+
+  "bedrock-edge": true,
+
+  "blocks": {
+    "bedrock": {
+      "name": "minecraft:sandstone",
+      "meta": 0
+    }
+  },
+
+  "capabilities": [
+    {
+      "capability": "IBlockVanillaDecoration",
+      "data": {
+        "blocked-types": ["FOSSIL"]
+      }
+    }
+  ]
+}

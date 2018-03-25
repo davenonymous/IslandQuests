@@ -1,0 +1,28 @@
+{
+  "name": "Ocean",
+
+  "weight": 50,
+  "biome": "minecraft:ocean",
+  "y-level": 50,
+  "y-range": 100,
+
+  "hill-height": 0,
+  "floor-height": 12,
+
+  "bedrock-edge": true,
+
+  "blocks": {
+    "top": {
+      "name": "minecraft:water",
+      "meta": 0
+    },
+    "filler": {
+      "name": "minecraft:water",
+      "meta": 0
+    },
+    "bedrock": {
+      "name": "minecraft:sandstone",
+      "meta": 0
+    }
+  }
+}
