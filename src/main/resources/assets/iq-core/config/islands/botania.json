@@ -1,0 +1,61 @@
+{
+  "name": "Botania",
+  "mods": ["botania"],
+
+  "weight": 100,
+  "biome": "minecraft:plains",
+  "y-level": 30,
+  "y-range": 100,
+
+  "hill-height": 6,
+  "floor-height": 8,
+
+  "bedrock-edge": false,
+
+  "blocks": {
+    "filler": {
+      "name": "minecraft:dirt",
+      "meta": 0
+    },
+    "top": {
+      "name": "minecraft:grass",
+      "meta": 0
+    },
+    "bedrock": {
+      "name": "minecraft:stone",
+      "meta": 0
+    }
+  },
+
+  "capabilities": [
+    {
+      "capability": "IReplaceBlocks",
+      "data": {
+        "rules": [
+          {
+            "chance": 0.1,
+            "original": {
+              "name": "minecraft:tallgrass",
+              "meta": "*"
+            },
+            "replacement": {
+              "name": "botania:flower",
+              "meta": "0-15"
+            }
+          },
+          {
+            "chance": 0.1,
+            "original": {
+              "name": "minecraft:double_plant",
+              "meta": "*"
+            },
+            "replacement": {
+              "name": "botania:flower",
+              "meta": "0-15"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

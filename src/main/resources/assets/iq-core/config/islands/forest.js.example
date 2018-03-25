@@ -1,0 +1,15 @@
+var IslandType = Java.type("org.dave.iq.islands.IslandType");
+var IslandTypeRegistry = Java.type("org.dave.iq.islands.IslandTypeRegistry");
+
+var main = function() {
+    var forest = new IslandType("Forest");
+    forest.setWeight(100);
+    forest.setBiome("minecraft:forest");
+    forest.setMinimumYLevel(60);
+    forest.setRangeYOffset(40);
+    forest.addOreSpawn("minecraft:iron_ore", 0, 80.0);
+    forest.addOreSpawn("minecraft:gold_ore", 0, 20.0);
+    forest.addOreSpawn("minecraft:diamond", 0, 2.0);
+
+    IslandTypeRegistry.registerIslandType(forest);
+}

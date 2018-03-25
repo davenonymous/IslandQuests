@@ -1,16 +1,16 @@
 [
-{
-  "modid": "islandquests",
-  "name": "Island Quests",
-  "description": "Locks a range of items and blocks behind quests that can only be solved on a specific void islandType",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["Davenonymous"],
-  "credits": "The Forge and FML guys, for making everything",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
+    {
+      "modid": "iq-core",
+      "name": "Island Quests Core",
+      "description": "Adds a Void Islands World type and an API for it",
+      "version": "${version}",
+      "mcversion": "${mcversion}",
+      "url": "",
+      "updateUrl": "",
+      "authorList": ["Davenonymous"],
+      "credits": "The Forge and FML guys, for making everything",
+      "logoFile": "",
+      "screenshots": [],
+      "dependencies": []
+    }
 ]
