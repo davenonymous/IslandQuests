@@ -1,7 +1,7 @@
 package org.dave.iq.api;
 
 public interface IIslandQuestsPlugin {
-    default void onChunkRegistryAvailable(IIslandRegistry islandRegistry) {
+    default void onIslandRegistryAvailable(IIslandRegistry islandRegistry) {
     }
 
     default void onIslandTypeRegistryAvailable(IIslandTypeRegistry islandTypeRegistry) {
@@ -11,5 +11,8 @@ public interface IIslandQuestsPlugin {
     }
 
     default void onIslandCapabilityRegistryAvailable(IIslandCapabilityRegistry islandCapabilityRegistry) {
+    }
+
+    default void onIslandNoiseMapReady(IIslandNoiseMap islandsNoise) {
     }
 }

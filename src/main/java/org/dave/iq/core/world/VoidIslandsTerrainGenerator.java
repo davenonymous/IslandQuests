@@ -7,34 +7,25 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import org.dave.iq.api.IIslandType;
-import org.dave.iq.core.configuration.WorldGenSettings;
+import org.dave.iq.core.configuration.ConfigurationHandler;
 import org.dave.iq.core.islands.Island;
 import org.dave.iq.core.islands.IslandRegistry;
 import org.dave.iq.core.islands.IslandTypeRegistry;
 import org.dave.iq.core.utility.Logz;
-import org.dave.iq.core.utility.OpenSimplexNoise;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class VoidIslandsTerrainGenerator {
     private final World world;
     private final VoidIslandsChunkGenerator provider;
 
-    private final OpenSimplexNoise noise;
-    private final OpenSimplexNoise noiseHeight;
-
-    private final Random rand;
 
     public VoidIslandsTerrainGenerator(World world, VoidIslandsChunkGenerator provider) {
         this.world = world;
         this.provider = provider;
 
-        // TODO: We should be able to reuse the worlds rand
-        this.rand = new Random(this.world.getSeed());
-        this.noise = new OpenSimplexNoise(rand.nextLong());
-        this.noiseHeight = new OpenSimplexNoise(rand.nextLong());
+        VoidIslandsNoise.instance.init(world);
     }
 
     public boolean isVoid(int chunkX, int chunkZ) {
@@ -43,8 +34,7 @@ public class VoidIslandsTerrainGenerator {
                 int actualX = (chunkX*16) + x;
                 int actualZ = (chunkZ*16) + z;
 
-                double chance = this.noise.eval(actualX / WorldGenSettings.featureSize, actualZ / WorldGenSettings.featureSize);
-                if(chance > WorldGenSettings.minimum) {
+                if(VoidIslandsNoise.instance.isIsland(actualX, actualZ)) {
                     return false;
                 }
             }
@@ -98,7 +88,7 @@ public class VoidIslandsTerrainGenerator {
         Island island;
         IIslandType islandType;
         if(!IslandRegistry.instance.hasIsland(chunkX, chunkZ)) {
-            islandType = IslandTypeRegistry.instance.getRandomIslandType(rand);
+            islandType = IslandTypeRegistry.instance.getRandomIslandType(world.rand);
             int heightOffset = world.rand.nextInt(islandType.getIslandHeightOffsetRange());
 
             island = new Island(islandType, heightOffset);
@@ -124,14 +114,15 @@ public class VoidIslandsTerrainGenerator {
                 int actualX = (chunkX*16) + x;
                 int actualZ = (chunkZ*16) + z;
 
-                double chance = this.noise.eval(actualX / WorldGenSettings.featureSize, actualZ / WorldGenSettings.featureSize);
+                double chance = VoidIslandsNoise.instance.getNoise(actualX, actualZ);
 
-                if(chance > WorldGenSettings.minimum) {
-                    double floorHeightRatio = MathHelper.clamp(chance, WorldGenSettings.minimum, WorldGenSettings.maximum);
-                    floorHeightRatio -= WorldGenSettings.minimum;
-                    floorHeightRatio *= (1.0d / (WorldGenSettings.maximum - WorldGenSettings.minimum));
+                if(chance > ConfigurationHandler.WorldGenSettings.minimum) {
+                    double floorHeightRatio = MathHelper.clamp(chance, ConfigurationHandler.WorldGenSettings.minimum, ConfigurationHandler.WorldGenSettings.maximum);
+                    floorHeightRatio -= ConfigurationHandler.WorldGenSettings.minimum;
+                    floorHeightRatio *= (1.0d / (ConfigurationHandler.WorldGenSettings.maximum - ConfigurationHandler.WorldGenSettings.minimum));
 
-                    double hillHeight = (this.noiseHeight.eval(actualX / 30.0D, actualZ / 30.0D) + 1.0);
+
+                    double hillHeight = (VoidIslandsNoise.instance.getHeightNoise(actualX, actualZ) + 1.0);
                     double hillHeightRatio = hillHeight * floorHeightRatio;
                     int blockHillHeight = (int)Math.floor(islandType.getMaxHillHeight() * hillHeightRatio);
 
@@ -150,7 +141,7 @@ public class VoidIslandsTerrainGenerator {
                         primer.setBlockState(x, bedrockYLevel-1, z, bedrockBlock);
                     }
 
-                    if(VoidIslandsEvents.isFirstSpawnPointCreation && chance > WorldGenSettings.minimum + 0.15f) {
+                    if(VoidIslandsEvents.isFirstSpawnPointCreation && chance > ConfigurationHandler.WorldGenSettings.minimum + 0.15f) {
                         VoidIslandsEvents.isFirstSpawnPointCreation = false;
                         Logz.info("Setting spawnpoint to: %s", new BlockPos(actualX, heighestBlockY+1, actualZ));
                         world.setSpawnPoint(new BlockPos(actualX, heighestBlockY+1, actualZ));

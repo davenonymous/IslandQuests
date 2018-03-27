@@ -1,9 +1,10 @@
-package org.dave.iq.core.utility;
+package org.dave.iq.core.init;
 
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import org.dave.iq.api.IIslandQuestsPlugin;
 import org.dave.iq.api.IslandQuestsPlugin;
+import org.dave.iq.core.utility.Logz;
 
 
 import java.util.ArrayList;
@@ -11,14 +12,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotatedInstanceUtil {
+public class PluginRegistry {
     public static ASMDataTable asmData;
+    private static List<IIslandQuestsPlugin> cachedPluginList = null;
 
-    private AnnotatedInstanceUtil() {
+    private PluginRegistry() {
     }
 
     public static List<IIslandQuestsPlugin> getIQPlugins() {
-        return getInstances(asmData, IslandQuestsPlugin.class, IIslandQuestsPlugin.class);
+        if(cachedPluginList == null) {
+            cachedPluginList = getInstances(asmData, IslandQuestsPlugin.class, IIslandQuestsPlugin.class);
+        }
+
+        return cachedPluginList;
     }
 
     private static <T> List<T> getInstances(ASMDataTable asmDataTable, Class annotationClass, Class<T> instanceClass) {
@@ -53,6 +59,6 @@ public class AnnotatedInstanceUtil {
     }
 
     public static void setAsmData(ASMDataTable asmData) {
-        AnnotatedInstanceUtil.asmData = asmData;
+        PluginRegistry.asmData = asmData;
     }
 }

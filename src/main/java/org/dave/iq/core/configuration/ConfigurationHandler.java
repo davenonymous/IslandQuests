@@ -65,6 +65,13 @@ public class ConfigurationHandler {
             "Simplex noise feature size, i.e. the scale of the generated noise"
         );
 
+        WorldGenSettings.heightFeatureSize = configuration.getFloat(
+                "heightFeatureSize",
+                CATEGORY_WORLDGEN,
+                30.0f, 1.0f, 1024.0f,
+                "Simplex noise feature size, i.e. the scale of the generated noise for the height map"
+        );
+
         WorldGenSettings.minimum = configuration.getFloat(
             "minimumTreshold",
             CATEGORY_WORLDGEN,
@@ -85,6 +92,10 @@ public class ConfigurationHandler {
     }
 
 
-
-
+    public static class WorldGenSettings {
+        public static double featureSize;
+        public static double heightFeatureSize;
+        public static double minimum;
+        public static double maximum;
+    }
 }

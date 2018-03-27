@@ -1,7 +1,5 @@
 package org.dave.iq.core;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -18,7 +16,7 @@ import org.dave.iq.core.islands.IslandRegistry;
 import org.dave.iq.core.islands.IslandTypeRegistry;
 import org.dave.iq.core.locking.PlayerEvents;
 import org.dave.iq.core.network.PackageHandler;
-import org.dave.iq.core.utility.AnnotatedInstanceUtil;
+import org.dave.iq.core.init.PluginRegistry;
 import org.dave.iq.core.utility.Logz;
 import org.dave.iq.core.world.VoidIslandsEvents;
 import org.dave.iq.core.world.VoidIslandsSavedData;
@@ -31,7 +29,7 @@ public class IQCore {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         Logz.logger = event.getModLog();
-        AnnotatedInstanceUtil.setAsmData(event.getAsmData());
+        PluginRegistry.setAsmData(event.getAsmData());
 
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
 
@@ -57,12 +55,12 @@ public class IQCore {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        for(IIslandQuestsPlugin plugin : AnnotatedInstanceUtil.getIQPlugins()) {
+        for(IIslandQuestsPlugin plugin : PluginRegistry.getIQPlugins()) {
             plugin.onIslandCapabilityRegistryAvailable(IslandCapabilityRegistry.instance);
             plugin.onIslandTypeRegistryAvailable(IslandTypeRegistry.instance);
 
             if(event.getSide() == Side.SERVER) {
-                plugin.onChunkRegistryAvailable(IslandRegistry.instance);
+                plugin.onIslandRegistryAvailable(IslandRegistry.instance);
             }
 
             if(event.getSide() == Side.CLIENT) {
