@@ -4,8 +4,6 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.iq.core.IQCore;
-import org.dave.iq.core.utility.JarExtract;
-import org.dave.iq.core.utility.Logz;
 
 import java.io.File;
 
@@ -30,18 +28,12 @@ public class ConfigurationHandler {
 
         islandDir = new File(configDir, "islands");
         if(islandDir.exists()) {
-            //islandDir.mkdirs();
-
-            int count = JarExtract.copy("assets/iq-core/config/islands", islandDir);
-            Logz.info("Extracted %d islands configs", count);
+            islandDir.mkdirs();
         }
 
         questDir = new File(configDir, "quests");
         if(!questDir.exists()) {
             questDir.mkdirs();
-
-            int count = JarExtract.copy("assets/iq-core/config/quests", questDir);
-            Logz.info("Extracted %d quests configs", count);
         }
 
         configuration = new Configuration(new File(configDir, "settings.cfg"), null);

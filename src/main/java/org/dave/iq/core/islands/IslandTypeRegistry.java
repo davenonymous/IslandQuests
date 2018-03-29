@@ -3,12 +3,12 @@ package org.dave.iq.core.islands;
 import com.google.gson.stream.JsonReader;
 import org.dave.iq.api.IIslandType;
 import org.dave.iq.api.IIslandTypeRegistry;
+import org.dave.iq.core.IQCore;
 import org.dave.iq.core.configuration.ConfigurationHandler;
 import org.dave.iq.core.utility.Logz;
+import org.dave.iq.core.utility.ResourceLoader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -20,28 +20,25 @@ public class IslandTypeRegistry implements IIslandTypeRegistry {
     private double totalWeight = 0.0;
 
     public void init() {
-        Logz.info("Initializing");
+        Logz.info("Initializing Island Type Registry");
         reload();
     }
 
     public void reload() {
         islandTypes = new HashMap<>();
 
-        if(!ConfigurationHandler.islandDir.exists()) {
-            Logz.info("Island directory %s does not exist", ConfigurationHandler.islandDir);
-            return;
-        }
+        ResourceLoader loader = new ResourceLoader(IQCore.class, ConfigurationHandler.islandDir, "assets/iq-core/config/islands/");
+        for(Map.Entry<String, InputStream> entry : loader.getResources().entrySet()) {
+            String filename = entry.getKey();
+            InputStream is = entry.getValue();
 
-        for(File file : ConfigurationHandler.islandDir.listFiles()) {
-            if(file.getName().endsWith(".json")) {
-                Logz.info(" > Loading island type from file: '%s'", file.getName());
-                try {
-                    IslandType type = IslandTypeJsonLoader.GSON.fromJson(new JsonReader(new FileReader(file)), IslandType.class);
-                    IslandTypeRegistry.instance.registerIslandType(type);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+            if (!filename.endsWith(".json")) {
+                continue;
             }
+            Logz.info(" > Loading island type from file: '%s'", filename);
+
+            IslandType type = IslandTypeJsonLoader.GSON.fromJson(new JsonReader(new InputStreamReader(is)), IslandType.class);
+            IslandTypeRegistry.instance.registerIslandType(type);
         }
 
         if(islandTypes.size() == 0) {
@@ -69,11 +66,11 @@ public class IslandTypeRegistry implements IIslandTypeRegistry {
     }
 
     public IIslandType getRandomIslandType(Random rand) {
-        double treshold = rand.nextDouble() * totalWeight;
+        double threshold = rand.nextDouble() * totalWeight;
         double position = 0.0;
         for(IIslandType type : islandTypes.values()) {
             position += type.getWeight();
-            if(position >= treshold) {
+            if(position >= threshold) {
                 return type;
             }
         }
