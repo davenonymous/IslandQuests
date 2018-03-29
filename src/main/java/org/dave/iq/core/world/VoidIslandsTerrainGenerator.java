@@ -85,6 +85,9 @@ public class VoidIslandsTerrainGenerator {
             return false;
         }
 
+        // TODO: Find the 3 most "centered" locations and make them accessible via the API
+        // TODO: Maybe create a graph with islands connected via edges. We want to generate bridges or wormholes or something anyway.
+
         Island island;
         IIslandType islandType;
         if(!IslandRegistry.instance.hasIsland(chunkX, chunkZ)) {
@@ -117,6 +120,7 @@ public class VoidIslandsTerrainGenerator {
                 double chance = VoidIslandsNoise.instance.getNoise(actualX, actualZ);
 
                 if(chance > ConfigurationHandler.WorldGenSettings.minimum) {
+                    // TODO: Maybe let the NoiseMap API provide exact hill+floor height information
                     double floorHeightRatio = MathHelper.clamp(chance, ConfigurationHandler.WorldGenSettings.minimum, ConfigurationHandler.WorldGenSettings.maximum);
                     floorHeightRatio -= ConfigurationHandler.WorldGenSettings.minimum;
                     floorHeightRatio *= (1.0d / (ConfigurationHandler.WorldGenSettings.maximum - ConfigurationHandler.WorldGenSettings.minimum));
@@ -141,6 +145,7 @@ public class VoidIslandsTerrainGenerator {
                         primer.setBlockState(x, bedrockYLevel-1, z, bedrockBlock);
                     }
 
+                    // TODO: Allow islands to prevent being spawn islands
                     if(VoidIslandsEvents.isFirstSpawnPointCreation && chance > ConfigurationHandler.WorldGenSettings.minimum + 0.15f) {
                         VoidIslandsEvents.isFirstSpawnPointCreation = false;
                         Logz.info("Setting spawnpoint to: %s", new BlockPos(actualX, heighestBlockY+1, actualZ));

@@ -8,6 +8,7 @@ public class ClientInfo implements IIClientInfo {
 
     Island currentIsland = null;
 
+    // TODO: Fire an event when an Entity enters an island (server + client) (different class/package though)
     public void setCurrentIsland(Island currentIsland) {
         this.currentIsland = currentIsland;
     }

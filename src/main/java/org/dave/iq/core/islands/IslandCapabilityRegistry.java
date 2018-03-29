@@ -42,5 +42,9 @@ public class IslandCapabilityRegistry implements IIslandCapabilityRegistry {
 
         CapabilityBlockVanillaDecoration.register();
         CapabilityReplaceBlocks.register();
+        // TODO: Create a capability: Spawn extra entities (mobs/animals)
+        // TODO: Create a capability: Lost Cities support
+        // TODO: Create a capability: Generate Village (requires custom village generation code to be worth it)
+        // TODO: Create a capability: Place arbitrary Structures. Maybe we can integrate with Recurrent Complex?
     }
 }

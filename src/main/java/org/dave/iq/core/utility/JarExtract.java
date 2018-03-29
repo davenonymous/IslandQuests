@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+// TODO: Replace this with the most recent version of the ResourceLoader class
 public class JarExtract {
     public static final boolean DEVELOPMENT = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
