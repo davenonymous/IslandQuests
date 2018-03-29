@@ -151,6 +151,13 @@ public class VoidIslandsTerrainGenerator {
             }
         }
 
+        island.markChunkAsGenerated(new ChunkPos(chunkX, chunkZ));
+
+        if(island.allChunksGenerated()) {
+            // TODO: Fire Event when all Chunks belonging to an island have been generated
+            // Logz.info("Fully generated island of type: %s", island.getIslandType().getName());
+        }
+
         return true;
     }
 }

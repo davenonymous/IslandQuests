@@ -17,6 +17,7 @@ import org.dave.iq.core.network.PackageHandler;
 import org.dave.iq.core.utility.Logz;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PlayerEvents {
@@ -58,8 +59,13 @@ public class PlayerEvents {
                 IIslandType islandType = island.getIslandType();
                 String startIslandText = "";
                 if(island.isStartingIsland()) {
-                    startIslandText = " (Spawn Island)";
+                    startIslandText += " (Spawn Island)";
                 }
+
+                if(!island.allChunksGenerated()) {
+                    startIslandText += String.format(Locale.ENGLISH, " (Generating: %.1f%%)", island.getGeneratedChunkRatio() * 100);
+                }
+
                 String iqDebugText = String.format("Island: %s (Height: %d)%s", islandType.getName(), islandType.getMinimumYLevel() + island.getHeightOffset(), startIslandText);
                 event.getLeft().add(iqDebugText);
             }
