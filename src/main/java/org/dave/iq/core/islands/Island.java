@@ -1,17 +1,18 @@
 package org.dave.iq.core.islands;
 
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagIntArray;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraftforge.common.util.Constants;
 import org.dave.iq.api.IIsland;
+import org.dave.iq.api.IIslandChunk;
 import org.dave.iq.api.IIslandType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Island implements IIsland {
-    List<ChunkPos> chunks;
-    List<ChunkPos> generatedChunks;
+    private Map<ChunkPos, IslandChunk> chunks;
 
     private IIslandType islandType;
     private int heightOffset;
@@ -19,30 +20,23 @@ public class Island implements IIsland {
     private boolean isStartingIsland;
 
     public Island(IIslandType islandType, int heightOffset) {
-        this.chunks = new ArrayList<>();
-        this.generatedChunks = new ArrayList<>();
+        this.chunks = new HashMap<>();
+
         this.islandType = islandType;
         this.heightOffset = heightOffset;
     }
 
     public Island(NBTTagCompound compound) {
-        this.chunks = new ArrayList<>();
-        this.generatedChunks = new ArrayList<>();
+        this.chunks = new HashMap<>();
 
         this.islandType = IslandTypeRegistry.instance.getIslandType(compound.getString("type"));
         this.heightOffset = compound.getInteger("height");
-        int[] chunkArray = compound.getIntArray("chunks");
 
-        for(int i = 0; i < chunkArray.length; i+=2) {
-            this.chunks.add(new ChunkPos(chunkArray[i], chunkArray[i+1]));
-        }
-
-        if(compound.hasKey("generatedChunks")) {
-            int[] genChunkArray = compound.getIntArray("generatedChunks");
-
-            for(int i = 0; i < genChunkArray.length; i+=2) {
-                this.generatedChunks.add(new ChunkPos(chunkArray[i], chunkArray[i+1]));
-            }
+        NBTTagList chunkTagList = compound.getTagList("chunks", Constants.NBT.TAG_COMPOUND);
+        for(NBTBase chunkTagBase : chunkTagList) {
+            NBTTagCompound chunkTag = (NBTTagCompound)chunkTagBase;
+            IslandChunk chunk = new IslandChunk(chunkTag);
+            chunks.put(chunk.getPosition(), chunk);
         }
 
         this.isStartingIsland = compound.getBoolean("start");
@@ -54,8 +48,8 @@ public class Island implements IIsland {
     }
 
     @Override
-    public List<ChunkPos> getIslandChunks() {
-        return this.chunks;
+    public Set<ChunkPos> getChunks() {
+        return this.chunks.keySet();
     }
 
     public int getActualHeight() {
@@ -77,15 +71,21 @@ public class Island implements IIsland {
     }
 
     public void setChunks(List<ChunkPos> chunks) {
-        this.chunks = chunks;
+        for(ChunkPos chunkPos : chunks) {
+            this.chunks.put(chunkPos, new IslandChunk(chunkPos));
+        }
     }
 
     public void markChunkAsGenerated(ChunkPos chunk) {
-        this.generatedChunks.add(chunk);
+        if(!this.chunks.containsKey(chunk)) {
+            return;
+        }
+
+        this.chunks.get(chunk).setGenerated(true);
     }
 
     public boolean allChunksGenerated() {
-        return this.chunks.size() == this.generatedChunks.size();
+        return !this.chunks.values().stream().anyMatch(islandChunk -> !islandChunk.isGenerated());
     }
 
     public double getGeneratedChunkRatio() {
@@ -93,7 +93,10 @@ public class Island implements IIsland {
             return 1.0d;
         }
 
-        return (double)this.generatedChunks.size() / (double)this.chunks.size();
+        int totalChunks = this.chunks.size();
+        long generatedChunks = this.chunks.values().stream().filter(islandChunk -> islandChunk.isGenerated()).count();
+
+        return (double)generatedChunks / (double)totalChunks;
     }
 
     public NBTTagCompound createTagCompound() {
@@ -102,22 +105,34 @@ public class Island implements IIsland {
         result.setInteger("height", heightOffset);
         result.setBoolean("start", isStartingIsland);
 
-        List<Integer> serialChunkPos = new ArrayList<>();
-        for(ChunkPos pos : chunks) {
-            serialChunkPos.add(pos.x);
-            serialChunkPos.add(pos.z);
+        NBTTagList chunkTagList = new NBTTagList();
+        for(IslandChunk chunk : this.chunks.values()) {
+            chunkTagList.appendTag(chunk.createTagCompound());
         }
-
-        result.setTag("chunks", new NBTTagIntArray(serialChunkPos));
-
-        List<Integer> serialGenChunkPos = new ArrayList<>();
-        for(ChunkPos pos : generatedChunks) {
-            serialGenChunkPos.add(pos.x);
-            serialGenChunkPos.add(pos.z);
-        }
-
-        result.setTag("generatedChunks", new NBTTagIntArray(serialGenChunkPos));
+        result.setTag("chunks", chunkTagList);
 
         return result;
+    }
+
+    public void setAverageChunkNoise(ChunkPos chunkPos, double noise) {
+        if(!this.chunks.containsKey(chunkPos)) {
+            return;
+        }
+
+        this.chunks.get(chunkPos).setAvgNoise(noise);
+    }
+
+    @Override
+    public double getAverageChunkNoise(ChunkPos chunkPos) {
+        if(!this.chunks.containsKey(chunkPos)) {
+            return 0.0d;
+        }
+
+        return this.chunks.get(chunkPos).getAverageNoise();
+    }
+
+    @Override
+    public IIslandChunk getIslandChunk(ChunkPos chunkPos) {
+        return this.chunks.get(chunkPos);
     }
 }

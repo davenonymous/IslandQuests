@@ -5,16 +5,20 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.dave.iq.api.IIslandChunk;
 import org.dave.iq.api.IIslandType;
 import org.dave.iq.core.client.ClientInfo;
-import org.dave.iq.core.islands.*;
+import org.dave.iq.core.islands.Island;
+import org.dave.iq.core.islands.IslandRegistry;
 import org.dave.iq.core.network.MessageClientInfo;
 import org.dave.iq.core.network.PackageHandler;
-import org.dave.iq.core.utility.Logz;
+import org.dave.iq.core.world.VoidIslandsNoise;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -52,7 +56,6 @@ public class PlayerEvents {
     @SubscribeEvent
     public static void onDrawDebugText(RenderGameOverlayEvent.Text event) {
         if(Minecraft.getMinecraft().gameSettings.showDebugInfo) {
-
             Island island = ClientInfo.instance.getCurrentIsland();
 
             if(island != null) {
@@ -68,6 +71,20 @@ public class PlayerEvents {
 
                 String iqDebugText = String.format("Island: %s (Height: %d)%s", islandType.getName(), islandType.getMinimumYLevel() + island.getHeightOffset(), startIslandText);
                 event.getLeft().add(iqDebugText);
+
+                BlockPos playerPos = Minecraft.getMinecraft().player.getPosition();
+                int chunkX = playerPos.getX() >> 4;
+                int chunkZ = playerPos.getZ() >> 4;
+                ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
+
+                double avgNoise = island.getAverageChunkNoise(chunkPos);
+
+                // TODO: Make sure this works on servers: do we have the noise map on clients?
+                double exactNoise = VoidIslandsNoise.instance.getNoise(playerPos.getX(), playerPos.getZ());
+
+                String iqChunkDebugText = String.format(Locale.ENGLISH, "Island Noise: position=%.2f, chunk avg=%.2f", exactNoise, avgNoise);
+                event.getLeft().add(iqChunkDebugText);
+
             }
         }
     }

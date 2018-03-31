@@ -2,11 +2,13 @@ package org.dave.iq.api;
 
 import net.minecraft.util.math.ChunkPos;
 
-import java.util.List;
+import java.util.Set;
 
 public interface IIsland {
     IIslandType getIslandType();
-    List<ChunkPos> getIslandChunks();
+    Set<ChunkPos> getChunks();
     int getHeightOffset();
     boolean isStartingIsland();
+    double getAverageChunkNoise(ChunkPos chunkPos);
+    IIslandChunk getIslandChunk(ChunkPos chunkPos);
 }

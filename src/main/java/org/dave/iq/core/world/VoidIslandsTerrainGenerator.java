@@ -112,6 +112,7 @@ public class VoidIslandsTerrainGenerator {
         IBlockState fillerBlock = islandType.getFillerBlock();
         IBlockState bedrockBlock = islandType.getBedrockBlock();
 
+        double noiseSum = 0.0d;
         for(int x = 0; x < 16; x++) {
             for(int z = 0; z < 16; z++) {
                 int actualX = (chunkX*16) + x;
@@ -120,6 +121,7 @@ public class VoidIslandsTerrainGenerator {
                 double chance = VoidIslandsNoise.instance.getNoise(actualX, actualZ);
 
                 if(chance > ConfigurationHandler.WorldGenSettings.minimum) {
+                    noiseSum += chance;
                     // TODO: Maybe let the NoiseMap API provide exact hill+floor height information
                     double floorHeightRatio = MathHelper.clamp(chance, ConfigurationHandler.WorldGenSettings.minimum, ConfigurationHandler.WorldGenSettings.maximum);
                     floorHeightRatio -= ConfigurationHandler.WorldGenSettings.minimum;
@@ -157,6 +159,7 @@ public class VoidIslandsTerrainGenerator {
         }
 
         island.markChunkAsGenerated(new ChunkPos(chunkX, chunkZ));
+        island.setAverageChunkNoise(new ChunkPos(chunkX, chunkZ), noiseSum / 256.0d);
 
         if(island.allChunksGenerated()) {
             // TODO: Fire Event when all Chunks belonging to an island have been generated

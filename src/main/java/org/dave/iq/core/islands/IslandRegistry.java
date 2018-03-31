@@ -32,7 +32,7 @@ public class IslandRegistry implements IIslandRegistry {
     }
 
     public void registerNewIsland(Island island) {
-        for(ChunkPos chunkPos : island.getIslandChunks()) {
+        for(ChunkPos chunkPos : island.getChunks()) {
             islands.put(chunkPos.x, chunkPos.z, island);
         }
     }
